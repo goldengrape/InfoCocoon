@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "InfoCocoon (信息茧房)",
+  "version": "1.0.0",
+  "description": "构建属于你的信息茧房 - 屏蔽推特、B站、YouTube上的喧嚣。",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.twitter.com/*",
+    "*://*.x.com/*",
+    "*://*.youtube.com/*",
+    "*://*.bilibili.com/*"
+  ],
+  "action": {
+    "default_popup": "src/popup/popup.html"
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.twitter.com/*",
+        "*://*.x.com/*",
+        "*://*.youtube.com/*",
+        "*://*.bilibili.com/*"
+      ],
+      "js": [
+        "src/utils/matcher.js",
+        "src/utils/config-manager.js",
+        "src/content/site-strategies.js",
+        "src/content/page-observer.js",
+        "src/content/visual-hider.js",
+        "src/content/content-script.js"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}

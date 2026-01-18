@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Web Filter</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Web Filter</h2>
+      <button id="optionsBtn" title="Settings">⚙️</button>
+    </div>
+
+    <div class="card current-site-card">
+      <div id="siteName">Current Site</div>
+      <label class="switch">
+        <input type="checkbox" id="siteToggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <div class="card add-keyword-card">
+      <h3>Quick Add Filter</h3>
+      <div class="input-group">
+        <input type="text" id="keywordInput" placeholder="Enter keyword...">
+        <button id="addBtn">Add</button>
+      </div>
+      <div id="message" class="message"></div>
+    </div>
+    
+  </div>
+  <script src="../utils/config-manager.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
