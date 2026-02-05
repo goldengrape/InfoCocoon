@@ -28,6 +28,7 @@ h2 {
     margin-bottom: 15px;
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 input[type="text"] {
@@ -36,6 +37,14 @@ input[type="text"] {
     border-radius: 4px;
     flex: 1;
     max-width: 300px;
+    min-width: 150px;
+}
+
+select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
 }
 
 button {
@@ -49,6 +58,20 @@ button {
 
 button:hover {
     background-color: #45a049;
+}
+
+.secondary-btn {
+    background-color: #666;
+}
+
+.secondary-btn:hover {
+    background-color: #555;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 /* Tags */
@@ -69,6 +92,19 @@ button:hover {
 
 .tag .text {
     font-weight: 500;
+}
+
+.tag .expiry {
+    font-size: 11px;
+    color: #888;
+    background-color: #ddd;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.tag.expiring-soon .expiry {
+    background-color: #ffcc00;
+    color: #333;
 }
 
 .tag .remove {
@@ -102,4 +138,22 @@ button:hover {
 
 .site-item.disabled {
     border-left: 4px solid #ccc;
+}
+
+/* Message */
+.message {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
 }

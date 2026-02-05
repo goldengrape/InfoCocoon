@@ -15,11 +15,26 @@
             <h2>Keywords</h2>
             <div class="input-group">
                 <input type="text" id="newKeyword" placeholder="Add new keyword">
+                <select id="expirySelect">
+                    <option value="permanent">永久有效</option>
+                    <option value="30">30天有效</option>
+                </select>
                 <button id="addKeywordBtn">Add</button>
             </div>
             <div id="keywordsList" class="tags-container">
                 <!-- Tags will go here -->
             </div>
+        </div>
+
+        <div class="section">
+            <h2>Import / Export</h2>
+            <p>备份或恢复你的关键词列表</p>
+            <div class="button-group">
+                <button id="exportBtn" class="secondary-btn">📤 导出关键词</button>
+                <button id="importBtn" class="secondary-btn">📥 导入关键词</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+            </div>
+            <div id="importExportMessage" class="message"></div>
         </div>
 
         <div class="section">

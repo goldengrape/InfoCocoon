@@ -36,35 +36,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     siteToggle.addEventListener('change', async () => {
         const enabled = siteToggle.checked;
 
-        // Update simple domain map
-        // Note: For complex sites we might want to store base domain, 
-        // but for V1 we stick to what ConfigManager handles.
-        // We really should store the specific hostname or a pattern.
-        // Simple approach: Store the exact hostname or update if exists.
-
-        // Find if we have a rule key matching this host
         let matchedKey = Object.keys(config.siteRules).find(key => hostname.includes(key));
 
         if (matchedKey) {
             config.siteRules[matchedKey] = enabled;
         } else {
-            // New site
             config.siteRules[hostname] = enabled;
         }
 
         await Config.save(config);
 
-        // Optional: Reload tab to apply?
         messageEl.textContent = "Saved. Reload page to apply.";
         setTimeout(() => messageEl.textContent = "", 2000);
     });
 
-    // Add Keyword
+    // Add Keyword (popup uses permanent by default)
     addBtn.addEventListener('click', async () => {
         const val = keywordInput.value.trim();
         if (val) {
-            if (!config.keywords.includes(val)) {
-                config.keywords.push(val);
+            const added = Config.addKeyword(config, val, null);  // null = permanent
+            if (added) {
                 await Config.save(config);
                 messageEl.textContent = "Keyword added!";
                 keywordInput.value = "";
@@ -72,6 +63,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 messageEl.textContent = "Keyword already exists.";
             }
+        }
+    });
+
+    // Enter key support
+    keywordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            addBtn.click();
         }
     });
 
