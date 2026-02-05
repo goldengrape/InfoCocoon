@@ -1,5 +1,6 @@
 // Options Logic
 const Config = window.WebFilter_Config;
+const Matcher = window.WebFilter_Matcher;
 
 document.addEventListener('DOMContentLoaded', async () => {
     const keywordsList = document.getElementById('keywordsList');
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const importBtn = document.getElementById('importBtn');
     const importFile = document.getElementById('importFile');
     const importExportMessage = document.getElementById('importExportMessage');
+    const keywordMessage = document.getElementById('keywordMessage');
 
     let config = await Config.load();
 
@@ -40,10 +42,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tag = document.createElement('div');
             const expiryText = formatExpiryDate(kw.expiresAt);
             const isExpiringSoon = kw.expiresAt && (kw.expiresAt - Date.now()) < 7 * 24 * 60 * 60 * 1000;
+            const isWildcard = Matcher.isWildcard(kw.word);
 
-            tag.className = `tag${isExpiringSoon ? ' expiring-soon' : ''}`;
+            tag.className = `tag${isExpiringSoon ? ' expiring-soon' : ''}${isWildcard ? ' is-wildcard' : ''}`;
             tag.innerHTML = `
                 <span class="text">${kw.word}</span>
+                ${isWildcard ? '<span class="wildcard-badge">通配符</span>' : ''}
                 ${expiryText ? `<span class="expiry">${expiryText}</span>` : ''}
                 <span class="remove" data-kw="${kw.word}">×</span>
             `;
@@ -82,6 +86,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     addKeywordBtn.addEventListener('click', async () => {
         const val = newKeywordInput.value.trim();
         if (val) {
+            // Validate keyword
+            const validation = Matcher.validateKeyword(val);
+            if (!validation.valid) {
+                showMessage(keywordMessage, validation.error, true);
+                return;
+            }
+
             const expiryValue = expirySelect.value;
             const expiresInDays = expiryValue === 'permanent' ? null : parseInt(expiryValue);
 
@@ -90,6 +101,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await Config.save(config);
                 newKeywordInput.value = '';
                 renderKeywords();
+            } else {
+                showMessage(keywordMessage, '关键词已存在', true);
             }
         }
     });

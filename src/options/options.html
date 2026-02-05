@@ -13,6 +13,7 @@
 
         <div class="section">
             <h2>Keywords</h2>
+            <p class="hint">💡 使用 <code>*</code> 匹配任意字符，<code>?</code> 匹配单个字符。例如：<code>熬了*通宵</code></p>
             <div class="input-group">
                 <input type="text" id="newKeyword" placeholder="Add new keyword">
                 <select id="expirySelect">
@@ -21,6 +22,7 @@
                 </select>
                 <button id="addKeywordBtn">Add</button>
             </div>
+            <div id="keywordMessage" class="message"></div>
             <div id="keywordsList" class="tags-container">
                 <!-- Tags will go here -->
             </div>
@@ -47,6 +49,7 @@
     </div>
 
     <script src="../utils/config-manager.js"></script>
+    <script src="../utils/matcher.js"></script>
     <script src="options.js"></script>
 </body>
 

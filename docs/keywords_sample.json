@@ -1,5 +1,5 @@
 {
-    "version": 1,
+    "version": 2,
     "exportedAt": "2026-02-05T03:59:44.000Z",
     "keywords": [
         {
@@ -144,6 +144,14 @@
         },
         {
             "word": "99%的",
+            "expiresAt": null
+        },
+        {
+            "word": "熬了*通宵",
+            "expiresAt": null
+        },
+        {
+            "word": "*%的人不知道",
             "expiresAt": null
         }
     ]
