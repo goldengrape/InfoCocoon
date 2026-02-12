@@ -28,6 +28,10 @@
 
     console.log('[WebFilter] Active strategy:', strategy);
 
+    // Pre-filter keywords: global + site-specific for current hostname
+    const activeKeywords = Config.getKeywordsForSite(config, hostname);
+    console.log('[WebFilter] Active keywords for', hostname, ':', activeKeywords.length);
+
     const checkAndHide = (container) => {
         // Find text content
         let textContent = "";
@@ -42,8 +46,8 @@
             textContent = container.innerText;
         }
 
-        // Match
-        if (Matcher.containsKeyword(textContent, config.keywords)) {
+        // Match against scoped keywords
+        if (Matcher.containsKeyword(textContent, activeKeywords)) {
             Hider.hide(container);
         }
     };

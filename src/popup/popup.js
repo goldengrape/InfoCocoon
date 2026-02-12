@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const siteNameEl = document.getElementById('siteName');
     const siteToggle = document.getElementById('siteToggle');
     const keywordInput = document.getElementById('keywordInput');
+    const scopeSelect = document.getElementById('scopeSelect');
     const addBtn = document.getElementById('addBtn');
     const optionsBtn = document.getElementById('optionsBtn');
     const messageEl = document.getElementById('message');
@@ -30,6 +31,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isEnabled = Config.isSiteEnabled(config, hostname);
     siteToggle.checked = isEnabled;
 
+    // Populate scope selector with current site option
+    if (scopeSelect && hostname && hostname !== 'unknown') {
+        // Find the matching domain key from siteRules for cleaner display
+        const matchedDomain = Object.keys(config.siteRules).find(key => hostname.includes(key));
+        const domainLabel = matchedDomain || hostname;
+        const siteOption = document.createElement('option');
+        siteOption.value = domainLabel;
+        siteOption.textContent = `仅 ${domainLabel}`;
+        scopeSelect.appendChild(siteOption);
+    }
+
     // Handlers
 
     // Toggle Site
@@ -54,14 +66,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     addBtn.addEventListener('click', async () => {
         const val = keywordInput.value.trim();
         if (val) {
-            const added = Config.addKeyword(config, val, null);  // null = permanent
+            const scopeValue = scopeSelect ? scopeSelect.value : 'global';
+            const scope = scopeValue === 'global' ? null : scopeValue;
+            const added = Config.addKeyword(config, val, null, scope);  // null = permanent
             if (added) {
                 await Config.save(config);
-                messageEl.textContent = "Keyword added!";
+                const scopeLabel = scope ? `[${scope}]` : '[全局]';
+                messageEl.textContent = `已添加 ${scopeLabel}`;
                 keywordInput.value = "";
                 setTimeout(() => messageEl.textContent = "", 2000);
             } else {
-                messageEl.textContent = "Keyword already exists.";
+                messageEl.textContent = "关键词已存在";
             }
         }
     });

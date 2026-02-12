@@ -1,6 +1,6 @@
 {
-    "version": 2,
-    "exportedAt": "2026-02-05T03:59:44.000Z",
+    "version": 3,
+    "exportedAt": "2026-02-12T03:59:44.000Z",
     "keywords": [
         {
             "word": "炸裂",
@@ -153,6 +153,21 @@
         {
             "word": "*%的人不知道",
             "expiresAt": null
+        },
+        {
+            "word": "！",
+            "expiresAt": null,
+            "scope": "bilibili.com"
+        },
+        {
+            "word": "震惊",
+            "expiresAt": null,
+            "scope": "bilibili.com"
+        },
+        {
+            "word": "clickbait",
+            "expiresAt": null,
+            "scope": "youtube.com"
         }
     ]
 }

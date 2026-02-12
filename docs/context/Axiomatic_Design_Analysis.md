@@ -22,9 +22,9 @@
 
 | ID | FR (功能要求) | DP (设计参数/模块) | 备注 (FP/不可变性说明) |
 |----|--------------|-------------------|---------------------|
-| 1  | 维护用户配置 (关键词, 站点开关) | **ConfigManager** | 负责 Storage I/O，提供 `Settings`不可变状态对象 |
+| 1  | 维护用户配置 (关键词, 站点开关, 作用域) | **ConfigManager** | 负责 Storage I/O，提供 `Settings`不可变状态对象，支持全局与站点独立关键词 |
 | 2  | 监控页面变动并提取潜在元素 | **PageOberver** | 封装 MutationObserver，提供流式节点输出来源 |
-| 3  | 匹配内容并执行视觉隐藏 | **FilterProcessor** | 核心纯逻辑判定 + 最小化 DOM 操作 |
+| 3  | 匹配内容并执行视觉隐藏 | **FilterProcessor** | 核心纯逻辑判定 + 最小化 DOM 操作，按当前站点过滤关键词 |
 
 *   **设计矩阵 (Design Matrix) - Level 1**
 

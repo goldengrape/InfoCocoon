@@ -1,7 +1,7 @@
 // ConfigManager Module
 (function (exports) {
     const DEFAULT_CONFIG = {
-        keywords: [],  // Now: [{word: string, expiresAt: number|null}]
+        keywords: [],  // [{word: string, expiresAt: number|null, scope?: string|null}]
         // Default sites (whitelist) - true means filtering is ENABLED
         siteRules: {
             "twitter.com": true,
@@ -96,31 +96,37 @@
     };
 
     /**
-     * Add a keyword with optional expiration
+     * Add a keyword with optional expiration and scope
      * @param {Object} config 
      * @param {string} word 
      * @param {number|null} expiresInDays - null for permanent, number for days
+     * @param {string|null} [scope=null] - null for global, domain string for site-specific
      * @returns {boolean} True if added, false if duplicate
      */
-    exports.addKeyword = function (config, word, expiresInDays) {
-        const exists = config.keywords.some(kw => kw.word === word);
+    exports.addKeyword = function (config, word, expiresInDays, scope) {
+        scope = scope || null;
+        const exists = config.keywords.some(kw => kw.word === word && (kw.scope || null) === scope);
         if (exists) return false;
 
         const expiresAt = expiresInDays === null
             ? null
             : Date.now() + (expiresInDays * 24 * 60 * 60 * 1000);
 
-        config.keywords.push({ word, expiresAt });
+        const keyword = { word, expiresAt };
+        if (scope) keyword.scope = scope;
+        config.keywords.push(keyword);
         return true;
     };
 
     /**
-     * Remove a keyword by word
+     * Remove a keyword by word and scope
      * @param {Object} config 
      * @param {string} word 
+     * @param {string|null} [scope=null] - null for global, domain string for site-specific
      */
-    exports.removeKeyword = function (config, word) {
-        config.keywords = config.keywords.filter(kw => kw.word !== word);
+    exports.removeKeyword = function (config, word, scope) {
+        scope = scope || null;
+        config.keywords = config.keywords.filter(kw => !(kw.word === word && (kw.scope || null) === scope));
     };
 
     /**
@@ -130,7 +136,7 @@
      */
     exports.exportKeywords = function (config) {
         return JSON.stringify({
-            version: 1,
+            version: 3,
             exportedAt: new Date().toISOString(),
             keywords: config.keywords
         }, null, 2);
@@ -151,10 +157,13 @@
         keywordsToImport.forEach(kw => {
             const word = typeof kw === 'string' ? kw : kw.word;
             const expiresAt = typeof kw === 'string' ? null : kw.expiresAt;
+            const scope = (typeof kw === 'string' ? null : kw.scope) || null;
 
-            const exists = config.keywords.some(k => k.word === word);
+            const exists = config.keywords.some(k => k.word === word && (k.scope || null) === scope);
             if (!exists) {
-                config.keywords.push({ word, expiresAt });
+                const keyword = { word, expiresAt };
+                if (scope) keyword.scope = scope;
+                config.keywords.push(keyword);
                 added++;
             } else {
                 skipped++;
@@ -167,10 +176,27 @@
     /**
      * Get active keyword words only (for matching)
      * @param {Object} config 
+     * @param {string} [hostname] - optional hostname to filter by scope
      * @returns {string[]} Array of keyword strings
      */
-    exports.getActiveKeywordWords = function (config) {
-        return config.keywords.map(kw => kw.word);
+    exports.getActiveKeywordWords = function (config, hostname) {
+        return exports.getKeywordsForSite(config, hostname).map(kw => kw.word);
+    };
+
+    /**
+     * Get keyword objects applicable for a given site.
+     * Returns global keywords + keywords scoped to the matching domain.
+     * @param {Object} config 
+     * @param {string} [hostname] - optional hostname; if omitted returns all keywords
+     * @returns {Array} Array of keyword objects
+     */
+    exports.getKeywordsForSite = function (config, hostname) {
+        if (!hostname) return config.keywords;
+        return config.keywords.filter(kw => {
+            const scope = kw.scope || null;
+            if (scope === null) return true;  // global keyword
+            return hostname.includes(scope);  // site-specific match
+        });
     };
 
 })(window.WebFilter_Config = window.WebFilter_Config || {});

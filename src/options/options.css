@@ -184,3 +184,20 @@ button:hover {
 .tag.is-wildcard {
     background-color: #e3f2fd;
 }
+
+/* Scope badge */
+.tag .scope-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.tag .scope-badge.global-scope {
+    color: #666;
+    background-color: #e0e0e0;
+}
+
+.tag .scope-badge.site-scope {
+    color: #fff;
+    background-color: #FF9800;
+}

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>Web Filter</title>
   <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
   <div class="container">
     <div class="header">
@@ -24,13 +26,17 @@
       <h3>Quick Add Filter</h3>
       <div class="input-group">
         <input type="text" id="keywordInput" placeholder="Enter keyword...">
+        <select id="scopeSelect">
+          <option value="global">🌐 全局</option>
+        </select>
         <button id="addBtn">Add</button>
       </div>
       <div id="message" class="message"></div>
     </div>
-    
+
   </div>
   <script src="../utils/config-manager.js"></script>
   <script src="popup.js"></script>
 </body>
+
 </html>

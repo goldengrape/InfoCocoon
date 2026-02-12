@@ -6,6 +6,36 @@
 
 ---
 
+## [1.3.0] - 2026-02-12
+
+### 新增
+- **关键词作用域**: 支持全局关键词和站点独立关键词
+  - **全局关键词** (默认): 在所有启用过滤的网站上生效
+  - **站点独立关键词**: 仅在指定域名上生效，例如 `！` 仅作用于 `bilibili.com`
+  - 向后兼容：旧版数据（无 `scope` 字段）自动视为全局关键词，无需迁移
+- Popup 弹窗和选项页添加关键词时支持选择作用域（🌐 全局 / 📌 指定站点）
+- 选项页关键词标签显示作用域标识徽章
+- 新增 `getKeywordsForSite()` API，按 hostname 返回合并后的关键词列表
+
+### 变更
+- **数据模型升级**: 关键词对象新增可选 `scope` 字段 `{word, expiresAt, scope?}`
+- `addKeyword()` / `removeKeyword()` 新增 `scope` 参数，重复检测同时匹配 word 和 scope
+- 内容过滤脚本按当前 hostname 预过滤关键词，站点独立关键词不再跨站点生效
+- 导出版本号升至 3
+
+### 文件变更
+- `src/utils/config-manager.js`: 新增 `getKeywordsForSite()`，scope 参数贯穿 CRUD 和导入导出
+- `src/content/content-script.js`: 使用 `getKeywordsForSite()` 按 hostname 过滤
+- `src/popup/popup.html`: 新增作用域选择器
+- `src/popup/popup.js`: 读取 scope 选择器并传递给 `addKeyword()`
+- `src/options/options.html`: 新增作用域选择器
+- `src/options/options.js`: scope 下拉框动态填充、标签显示 scope 徽章、scope 感知的增删
+- `src/options/options.css`: 新增 `.scope-badge` 样式
+- `docs/keywords_sample.json`: 版本 3，新增站点独立关键词示例
+- `docs/URD.md`: 新增 v1.3 关键词作用域需求文档
+
+---
+
 ## [1.2.0] - 2026-02-05
 
 ### 新增

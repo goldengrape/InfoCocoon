@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const keywordsList = document.getElementById('keywordsList');
     const sitesList = document.getElementById('sitesList');
     const newKeywordInput = document.getElementById('newKeyword');
+    const scopeSelect = document.getElementById('scopeSelect');
     const expirySelect = document.getElementById('expirySelect');
     const addKeywordBtn = document.getElementById('addKeywordBtn');
     const exportBtn = document.getElementById('exportBtn');
@@ -15,6 +16,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const keywordMessage = document.getElementById('keywordMessage');
 
     let config = await Config.load();
+
+    // Populate scope selector from siteRules
+    function populateScopeSelect() {
+        // Remove all options except the first (global)
+        while (scopeSelect.options.length > 1) {
+            scopeSelect.remove(1);
+        }
+        Object.keys(config.siteRules).forEach(domain => {
+            const opt = document.createElement('option');
+            opt.value = domain;
+            opt.textContent = `📌 ${domain}`;
+            scopeSelect.appendChild(opt);
+        });
+    }
+    populateScopeSelect();
 
     function showMessage(el, text, isError = false) {
         el.textContent = text;
@@ -43,19 +59,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             const expiryText = formatExpiryDate(kw.expiresAt);
             const isExpiringSoon = kw.expiresAt && (kw.expiresAt - Date.now()) < 7 * 24 * 60 * 60 * 1000;
             const isWildcard = Matcher.isWildcard(kw.word);
+            const scope = kw.scope || null;
 
             tag.className = `tag${isExpiringSoon ? ' expiring-soon' : ''}${isWildcard ? ' is-wildcard' : ''}`;
             tag.innerHTML = `
                 <span class="text">${kw.word}</span>
+                ${scope ? `<span class="scope-badge site-scope">📌 ${scope}</span>` : '<span class="scope-badge global-scope">🌐</span>'}
                 ${isWildcard ? '<span class="wildcard-badge">通配符</span>' : ''}
                 ${expiryText ? `<span class="expiry">${expiryText}</span>` : ''}
-                <span class="remove" data-kw="${kw.word}">×</span>
+                <span class="remove" data-kw="${kw.word}" data-scope="${scope || ''}">×</span>
             `;
             keywordsList.appendChild(tag);
 
             tag.querySelector('.remove').addEventListener('click', async (e) => {
                 const word = e.target.getAttribute('data-kw');
-                Config.removeKeyword(config, word);
+                const scopeAttr = e.target.getAttribute('data-scope');
+                const removeScope = scopeAttr === '' ? null : scopeAttr;
+                Config.removeKeyword(config, word, removeScope);
                 await Config.save(config);
                 renderKeywords();
             });
@@ -95,8 +115,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const expiryValue = expirySelect.value;
             const expiresInDays = expiryValue === 'permanent' ? null : parseInt(expiryValue);
+            const scopeValue = scopeSelect.value;
+            const scope = scopeValue === 'global' ? null : scopeValue;
 
-            const added = Config.addKeyword(config, val, expiresInDays);
+            const added = Config.addKeyword(config, val, expiresInDays, scope);
             if (added) {
                 await Config.save(config);
                 newKeywordInput.value = '';
@@ -156,3 +178,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderKeywords();
     renderSites();
 });
+

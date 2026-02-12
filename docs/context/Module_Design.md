@@ -10,8 +10,14 @@
 ### 2. 数据结构定义 (Immutable)
 
 ```typescript
+type Keyword = {
+    readonly word: string;
+    readonly expiresAt: number | null;
+    readonly scope?: string | null;  // null/missing = global, string = site-specific
+};
+
 type FilterConfig = {
-    readonly keywords: ReadonlyArray<string>;
+    readonly keywords: ReadonlyArray<Keyword>;
     readonly siteRules: ReadonlyMap<string, boolean>; // Host -> Enabled
 };
 
@@ -30,6 +36,35 @@ type StorageInterface = {
 **契约**:
 *   **Requires**: `hostname` 不为空。
 *   **Ensures**: 如果 `hostname` 在白名单且值为 true，返回 true；否则根据默认策略返回。
+
+#### Function: `addKeyword`
+*   **Signature**: `(config: FilterConfig, word: string, expiresInDays: number|null, scope?: string|null) -> boolean`
+*   **Side Effects**: Mutates `config.keywords`
+
+**契约**:
+*   **Requires**: `word` 不为空。
+*   **Ensures**: 重复检测同时匹配 `word` 和 `scope`，两者都相同才视为重复。添加成功返回 true，重复返回 false。
+
+#### Function: `removeKeyword`
+*   **Signature**: `(config: FilterConfig, word: string, scope?: string|null) -> void`
+*   **Side Effects**: Mutates `config.keywords`
+
+**契约**:
+*   **Ensures**: 仅移除 `word` 和 `scope` 都匹配的关键词。
+
+#### Function: `getKeywordsForSite`
+*   **Signature**: `(config: FilterConfig, hostname?: string) -> Keyword[]`
+*   **Side Effects**: None
+
+**契约**:
+*   **Ensures**: 返回全局关键词 + 匹配该 hostname 的站点独立关键词。未传 hostname 时返回所有关键词。
+
+#### Function: `getActiveKeywordWords`
+*   **Signature**: `(config: FilterConfig, hostname?: string) -> string[]`
+*   **Side Effects**: None
+
+**契约**:
+*   **Ensures**: 等价于 `getKeywordsForSite(config, hostname).map(kw => kw.word)`。
 
 ---
 
@@ -63,11 +98,13 @@ type SiteStrategy = {
 
 #### Function: `containsKeyword`
 
-*   **Signature**: `(text: string, keywords: string[]) -> boolean`
+*   **Signature**: `(text: string, keywords: Keyword[] | string[]) -> boolean`
 *   **Side Effects**: None
 
 **契约**:
 *   **Ensures**:
+    *   支持字符串数组和对象数组两种格式。
+    *   自动识别通配符模式（含 `*` 或 `?`）并转为正则匹配。
     *   Result is `true` if any keyword is a substring of `text` (case-insensitive).
     *   Result is `false` if `keywords` is empty or `text` is empty.
 
